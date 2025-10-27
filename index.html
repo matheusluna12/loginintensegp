@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login ECOA</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f6f7fb; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .card { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 0 10px #ccc; width: 300px; }
+    h2 { text-align: center; margin-bottom: 1rem; }
+    input, button { width: 100%; padding: 8px; margin-top: 8px; border-radius: 5px; border: 1px solid #bbb; }
+    button { background: #4a6cf7; color: white; border: none; cursor: pointer; }
+    button:hover { background: #3b5ae0; }
+    .mensagem { margin-top: 10px; font-size: 0.9rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Login</h2>
+    <input id="documento" placeholder="CPF / CNPJ" />
+    <input id="senha" type="password" placeholder="Senha" />
+    <button onclick="fazerLogin()">Entrar</button>
+    <div class="mensagem" id="msg"></div>
+  </div>
+
+  <script>
+    async function fazerLogin() {
+      const documento = document.getElementById('documento').value;
+      const senha = document.getElementById('senha').value;
+      const msg = document.getElementById('msg');
+      msg.textContent = 'Conectando...';
+      const resp = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ documento, senha })
+      });
+      const data = await resp.json();
+      if (resp.ok) {
+        msg.textContent = '✅ Bem-vindo(a), ' + data.usuario.nome;
+        localStorage.setItem('token', data.token);
+      } else {
+        msg.textContent = '❌ ' + (data.mensagem || 'Erro ao logar');
+      }
+    }
+  </script>
+</body>
+</html>
