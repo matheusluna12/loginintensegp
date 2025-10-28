@@ -4,41 +4,202 @@
   <meta charset="UTF-8" />
   <title>Login ECOA</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f6f7fb; display: flex; justify-content: center; align-items: center; height: 100vh; }
-    .card { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 0 10px #ccc; width: 300px; }
-    h2 { text-align: center; margin-bottom: 1rem; }
-    input, button { width: 100%; padding: 8px; margin-top: 8px; border-radius: 5px; border: 1px solid #bbb; }
-    button { background: #4a6cf7; color: white; border: none; cursor: pointer; }
-    button:hover { background: #3b5ae0; }
-    .mensagem { margin-top: 10px; font-size: 0.9rem; text-align: center; }
+    .container {
+      display: flex; 
+      align-items: center;
+      justify-content: center;
+      width: 100%
+    }
+    body { 
+      font-family: Arial, sans-serif; 
+      background: radial-gradient(circle at center, rgba(85, 177, 230, 0.8), rgba(38, 17, 157, 0.8)), url("Imagens/garoto.jpg");
+      background-size: cover; 
+      background-position: center; 
+      background-repeat: no-repeat;  
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      height: 100%; 
+      color: white;
+      margin: 0;
+      box-sizing: border-box;
+    }
+    
+    img {
+      width: 386px; 
+      height: auto; 
+      margin-right: 150px;
+      margin-bottom: 20%;
+    }
+
+    .card { 
+      background: #11304C50;
+      padding: 0;
+      border-radius: 59px;
+      width: 100%;
+      max-width: 350px;
+      text-align: center;
+      padding: 1.5rem 2rem;
+    }
+
+    .card h1 {
+        font-size: 2.2rem;
+        font-weight: bold;
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+    .card p {
+        font-size: 1rem;
+        margin-bottom: 20px;
+        opacity: 0.9;
+    }
+    
+    .input-group {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        border-bottom: 2px solid #ffffff;
+        margin-bottom: 20px;
+        padding-bottom: 5px;
+    }
+    .input-group span {
+        font-size: 1.5rem;
+        margin-right: 10px;
+        opacity: 0.9;
+    }
+    
+    .card input {
+        width: 100%;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: white;
+        font-size: 1.1rem;
+        padding: 5px;
+        box-sizing: border-box; 
+    }
+    
+    ::placeholder { color: #ffffff; opacity: 0.8; }
+    :-ms-input-placeholder { color: #ffffff; }
+    ::-ms-input-placeholder { color: #ffffff; }
+
+    .btn-login {
+        width: 100%;
+        background-color: #FBC42F;
+        color: black;
+        border: none;
+        border-radius: 50px;
+        padding: 15px 0;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .btn-register {
+        margin-top: 15px;
+    }
+    
+    .forgot-pass {
+        color: white;
+        text-decoration: none;
+        font-size: 0.9rem;
+        margin-top: 15px;
+        opacity: 0.9;
+        display: block;
+    }
+    
+    .social-text {
+        font-size: 0.9rem;
+        margin-top: 25px;
+        margin-bottom: 15px;
+        opacity: 0.9;
+    }
+    .social-icon {
+        font-family: 'Arial Black', Gadget, sans-serif;
+        font-size: 2rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .mensagem { 
+      margin-top: 10px; 
+      font-size: 0.9rem; 
+      text-align: center; 
+      color: white;
+      height: 1.2em;
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Login</h2>
-    <input id="documento" placeholder="CPF / CNPJ" />
-    <input id="senha" type="password" placeholder="Senha" />
-    <button onclick="fazerLogin()">Entrar</button>
-    <div class="mensagem" id="msg"></div>
+  <div class="container">
+      <img src="Imagens/logo.png" alt="logo">
+      
+      <div class="card">
+        
+        <h1>Seja Bem Vindo !</h1>
+        <p>Bem vindos a plataforma ao Banco de Especialistas</p>
+
+        <form onsubmit="fazerLogin(event)">
+
+            <div class="input-group">
+                <span>👤</span>
+                <input id="documento" type="text" placeholder="CNPJ / CPF" required>
+            </div>
+
+            <div class="input-group">
+                <span>🔒</span>
+                 <input id="senha" type="password" placeholder="senha" required>
+            </div>
+
+            <button type="submit" class="btn-login">
+                LOG IN
+            </button>
+            
+            <div class="mensagem" id="msg"></div>
+
+            <a href="#" class="forgot-pass">
+                Esqueceu a senha ?
+            </a>
+
+            <button type="button" class="btn-login btn-register">
+                CADASTRE-SE
+            </button>
+        </form>
+        
+        <p class="social-text">Faça login com</p>
+        <div class="social-icon">G+</div>
+
+      </div>
   </div>
 
   <script>
-    async function fazerLogin() {
+    async function fazerLogin(event) {
+      event.preventDefault();
+      
       const documento = document.getElementById('documento').value;
       const senha = document.getElementById('senha').value;
       const msg = document.getElementById('msg');
       msg.textContent = 'Conectando...';
-      const resp = await fetch('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ documento, senha })
-      });
-      const data = await resp.json();
-      if (resp.ok) {
-        msg.textContent = '✅ Bem-vindo(a), ' + data.usuario.nome;
-        localStorage.setItem('token', data.token);
-      } else {
-        msg.textContent = '❌ ' + (data.mensagem || 'Erro ao logar');
+      
+      try { 
+        const resp = await fetch('/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ documento, senha })
+        });
+        
+        const data = await resp.json();
+        
+        if (resp.ok) {
+          msg.textContent = '✅ Bem-vindo(a), ' + data.usuario.nome;
+          localStorage.setItem('token', data.token);
+        } else {
+          msg.textContent = '❌ ' + (data.mensagem || 'Erro ao logar');
+        }
+      } catch (error) {
+        msg.textContent = '❌ Erro de conexão. Tente novamente.';
       }
     }
   </script>
