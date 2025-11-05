@@ -37,7 +37,7 @@
       padding: 0;
       border-radius: 59px;
       width: 100%;
-      max-width: 350px;
+      max-width: 380px;
       text-align: center;
       padding: 1.5rem 2rem;
     }
@@ -68,14 +68,14 @@
         opacity: 0.9;
     }
     
-    .card input {
+    .card input, .card select {
         width: 100%;
         background: transparent;
         border: none;
         outline: none;
         color: white;
-        font-size: 1.1rem;
-        padding: 5px;
+        font-size: 1.05rem;
+        padding: 8px 5px;
         box-sizing: border-box; 
     }
     
@@ -83,53 +83,41 @@
     :-ms-input-placeholder { color: #ffffff; }
     ::-ms-input-placeholder { color: #ffffff; }
 
-    .btn-login {
+    .btn {
         width: 100%;
         background-color: #FBC42F;
         color: black;
         border: none;
         border-radius: 50px;
-        padding: 15px 0;
+        padding: 14px 0;
         font-size: 1rem;
         font-weight: bold;
         cursor: pointer;
-        margin-top: 20px;
         text-transform: uppercase;
         letter-spacing: 1px;
     }
-    .btn-register {
-        margin-top: 15px;
+    .btn-secondary {
+        background: transparent;
+        border: 2px solid #FBC42F;
+        color: #FBC42F;
+        margin-top: 10px;
     }
     
-    .forgot-pass {
-        color: white;
-        text-decoration: none;
-        font-size: 0.9rem;
-        margin-top: 15px;
-        opacity: 0.9;
-        display: block;
-    }
-    
-    .social-text {
-        font-size: 0.9rem;
-        margin-top: 25px;
-        margin-bottom: 15px;
-        opacity: 0.9;
-    }
-    .social-icon {
-        font-family: 'Arial Black', Gadget, sans-serif;
-        font-size: 2rem;
-        font-weight: bold;
+    .link {
+        color: #FBC42F;
+        text-decoration: underline;
         cursor: pointer;
     }
 
     .mensagem { 
       margin-top: 10px; 
-      font-size: 0.9rem; 
+      font-size: 0.95rem; 
       text-align: center; 
       color: white;
-      height: 1.2em;
+      min-height: 1.2em;
     }
+
+    .hidden { display: none; }
   </style>
 </head>
 <body>
@@ -141,33 +129,54 @@
         <h1>Seja Bem Vindo !</h1>
         <p>Bem vindos a plataforma ao Banco de Especialistas</p>
 
-        <form onsubmit="fazerLogin(event)">
-
+        <!-- LOGIN -->
+        <form id="form-login" onsubmit="fazerLogin(event)">
             <div class="input-group">
                 <span>👤</span>
                 <input id="documento" type="text" placeholder="CNPJ / CPF" required>
             </div>
-
             <div class="input-group">
                 <span>🔒</span>
-                 <input id="senha" type="password" placeholder="senha" required>
+                 <input id="senha" type="password" placeholder="Senha" required>
             </div>
-
-            <button type="submit" class="btn-login">
-                LOG IN
-            </button>
-            
-            <div class="mensagem" id="msg"></div>
-
-            <a href="#" class="forgot-pass">
-                Esqueceu a senha ?
-            </a>
-
-            <button type="button" class="btn-login btn-register">
-                CADASTRE-SE
-            </button>
+            <button type="submit" class="btn">Entrar</button>
+            <div class="mensagem" id="msg-login"></div>
+            <a class="link" onclick="mostrarCadastro(true)">Ainda não tem conta? Cadastre-se</a>
         </form>
-        
+
+        <!-- CADASTRO -->
+        <form id="form-cadastro" class="hidden" onsubmit="fazerCadastro(event)">
+            <div class="input-group">
+                <span>🧑</span>
+                <input id="nome" type="text" placeholder="Seu nome completo" required>
+            </div>
+            <div class="input-group">
+                <span>🆔</span>
+                <input id="cad_documento" type="text" placeholder="CPF/CNPJ" required>
+            </div>
+            <div class="input-group">
+                <span>🎓</span>
+                <select id="perfil" required>
+                  <option value="" disabled selected>Perfil</option>
+                  <option value="aluno">Aluno</option>
+                  <option value="professor">Professor</option>
+                  <option value="diretor">Diretor</option>
+                  <option value="pai">Pai</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <span>🔒</span>
+                <input id="cad_senha" type="password" placeholder="Senha (mín. 6)" minlength="6" required>
+            </div>
+            <div class="input-group">
+                <span>✅</span>
+                <input id="cad_confirmar" type="password" placeholder="Confirmar senha" minlength="6" required>
+            </div>
+            <button type="submit" class="btn">Cadastrar</button>
+            <div class="mensagem" id="msg-cadastro"></div>
+            <a class="link" onclick="mostrarCadastro(false)">Já tem conta? Entrar</a>
+        </form>
+
         <p class="social-text">Faça login com</p>
         <div class="social-icon">G+</div>
 
@@ -175,12 +184,19 @@
   </div>
 
   <script>
+    function mostrarCadastro(ativar) {
+      document.getElementById('form-login').classList.toggle('hidden', ativar);
+      document.getElementById('form-cadastro').classList.toggle('hidden', !ativar);
+      document.getElementById('msg-login').textContent = '';
+      document.getElementById('msg-cadastro').textContent = '';
+    }
+
     async function fazerLogin(event) {
       event.preventDefault();
       
-      const documento = document.getElementById('documento').value;
+      const documento = document.getElementById('documento').value.trim();
       const senha = document.getElementById('senha').value;
-      const msg = document.getElementById('msg');
+      const msg = document.getElementById('msg-login');
       msg.textContent = 'Conectando...';
       
       try { 
@@ -199,6 +215,41 @@
           msg.textContent = '❌ ' + (data.mensagem || 'Erro ao logar');
         }
       } catch (error) {
+        msg.textContent = '❌ Erro de conexão. Tente novamente.';
+      }
+    }
+
+    async function fazerCadastro(event) {
+      event.preventDefault();
+      const nome = document.getElementById('nome').value.trim();
+      const documento = document.getElementById('cad_documento').value.trim();
+      const perfil = document.getElementById('perfil').value;
+      const senha = document.getElementById('cad_senha').value;
+      const confirmar = document.getElementById('cad_confirmar').value;
+      const msg = document.getElementById('msg-cadastro');
+      msg.textContent = 'Enviando cadastro...';
+
+      if (senha !== confirmar) {
+        msg.textContent = '❌ As senhas não coincidem';
+        return;
+      }
+
+      try {
+        const resp = await fetch('/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, documento, perfil, senha, confirmar })
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+          msg.textContent = '✅ ' + data.mensagem + '. Logado como ' + data.usuario.nome;
+          localStorage.setItem('token', data.token);
+          // volta para o formulário de login já autenticado, se desejar
+          mostrarCadastro(false);
+        } else {
+          msg.textContent = '❌ ' + (data.mensagem || 'Erro ao cadastrar');
+        }
+      } catch (e) {
         msg.textContent = '❌ Erro de conexão. Tente novamente.';
       }
     }
