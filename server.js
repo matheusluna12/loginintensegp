@@ -21,6 +21,7 @@ app.use(express.static(__dirname));
 app.use(express.json());
 app.use(cors({ origin: CORS_ORIGIN, credentials: false }));
 
+// Banco em memória apenas para demo
 const PASSWORD_HASH = bcrypt.hashSync("123456", 10);
 const users = [
   { id: 1, nome: "Matheus", documento: "123456789", perfil: "aluno", password_hash: PASSWORD_HASH },
@@ -55,6 +56,51 @@ function exigirPerfis(...perfils) {
   };
 }
 
+// --- NOVO: Cadastro ---
+app.post("/auth/register", (req, res) => {
+  const { nome, documento, perfil, senha, confirmar } = req.body || {};
+
+  // Validações básicas
+  if (!nome || !documento || !perfil || !senha) {
+    return res.status(400).json({ mensagem: "Campos obrigatórios: nome, documento, perfil e senha" });
+  }
+  if (senha.length < 6) {
+    return res.status(400).json({ mensagem: "A senha deve ter pelo menos 6 caracteres" });
+  }
+  if (typeof confirmar === "string" && confirmar !== senha) {
+    return res.status(400).json({ mensagem: "As senhas não coincidem" });
+  }
+
+  const perfisPermitidos = ["aluno", "professor", "diretor", "pai"];
+  if (!perfisPermitidos.includes(perfil)) {
+    return res.status(400).json({ mensagem: "Perfil inválido. Use: aluno, professor, diretor ou pai" });
+  }
+
+  // Documento único
+  const jaExiste = users.find(u => u.documento === String(documento).trim());
+  if (jaExiste) {
+    return res.status(409).json({ mensagem: "Documento já cadastrado" });
+  }
+
+  // Cria usuário
+  const password_hash = bcrypt.hashSync(String(senha), 10);
+  const novo = {
+    id: users.length ? Math.max(...users.map(u => u.id)) + 1 : 1,
+    nome: String(nome).trim(),
+    documento: String(documento).trim(),
+    perfil,
+    password_hash
+  };
+  users.push(novo);
+
+  const token = gerarToken(novo);
+  return res.status(201).json({
+    mensagem: "Cadastro realizado com sucesso",
+    token,
+    usuario: { id: novo.id, nome: novo.nome, documento: novo.documento, perfil: novo.perfil }
+  });
+});
+
 app.post("/auth/login", (req, res) => {
   const documento = (req.body?.documento ?? "").trim();
   const senha = (req.body?.senha ?? "").toString();
@@ -74,3 +120,4 @@ app.get("/area/diretor", autenticar, exigirPerfis("diretor"), (req, res) => res.
 app.get("/area/pai", autenticar, exigirPerfis("pai"), (req, res) => res.json({ mensagem: `Bem-vindo(a), ${req.usuario.nome} (pai)` }));
 
 app.listen(PORT, () => console.log(`http://localhost:${PORT}`));
+
